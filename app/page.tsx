@@ -1,8 +1,23 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { VertexLogo } from "@/components/ui/vertex-components";
 
 export default function Home() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#0F172A] font-sans relative overflow-x-hidden selection:bg-[#FFEEE5] selection:text-[#F97316]">
       {/* Background Subtle Texture / Diagonal Grid pattern */}
@@ -58,8 +73,55 @@ export default function Home() {
                 className="w-full h-full object-cover"
               />
             </div>
+
+            {/* Mobile Navigation Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-navigation"
+              aria-label="Toggle navigation menu"
+              className="sm:hidden p-2 text-[#334155] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-lg transition-all cursor-pointer"
+            >
+              {isMobileMenuOpen ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="4" x2="20" y1="12" y2="12" />
+                  <line x1="4" x2="20" y1="6" y2="6" />
+                  <line x1="4" x2="20" y1="18" y2="18" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <nav
+            id="mobile-navigation"
+            aria-label="Mobile navigation"
+            className="sm:hidden border-t border-[#E2E8F0] bg-[#FAF8F5] px-6 py-4 flex flex-col gap-3 shadow-md"
+          >
+            <Link 
+              href="/courses"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-base font-medium text-[#334155] hover:text-[#0F172A] py-2 px-3 rounded-md hover:bg-[#F1F5F9] transition-colors"
+            >
+              Courses
+            </Link>
+            <Link 
+              href="/my-learning"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-base font-medium text-[#334155] hover:text-[#0F172A] py-2 px-3 rounded-md hover:bg-[#F1F5F9] transition-colors"
+            >
+              My Learning
+            </Link>
+          </nav>
+        )}
       </header>
 
       {/* Main Content Area */}
