@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   description: "A unified design language for Vertex learning platform.",
 };
 
+const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+if (!publishableKey) {
+  throw new Error("Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY in environment variables.");
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +34,7 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-[#FAFAFC] text-[#0F172A]">
-        <ClerkProvider>
+        <ClerkProvider publishableKey={publishableKey}>
           {children}
         </ClerkProvider>
       </body>
