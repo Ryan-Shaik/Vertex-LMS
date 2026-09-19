@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { VertexLogo } from "@/components/ui/vertex-components";
 
@@ -63,16 +63,28 @@ export default function Home() {
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
             </button>
-            <div className="w-9 h-9 rounded-full overflow-hidden border border-[#CBD5E1] shadow-xs cursor-pointer hover:ring-2 hover:ring-[#F97316]/30 transition-all">
-              <Image 
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" 
-                alt="User Avatar"
-                width={36}
-                height={36}
-                unoptimized
-                className="w-full h-full object-cover"
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button className="text-sm font-medium text-[#334155] hover:text-[#0F172A] px-3 py-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors cursor-pointer">
+                  Sign in
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="text-sm font-semibold bg-[#0F172A] text-white hover:bg-[#1E293B] px-3.5 py-1.5 rounded-lg transition-all shadow-xs cursor-pointer">
+                  Sign up
+                </button>
+              </SignUpButton>
+            </Show>
+
+            <Show when="signed-in">
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: "w-9 h-9 ring-1 ring-[#CBD5E1] hover:ring-[#F97316]/40 transition-all",
+                  },
+                }}
               />
-            </div>
+            </Show>
 
             {/* Mobile Navigation Toggle Button */}
             <button
@@ -120,6 +132,26 @@ export default function Home() {
             >
               My Learning
             </Link>
+            <div className="pt-2 border-t border-[#E2E8F0]/80 flex flex-col gap-2">
+              <Show when="signed-out">
+                <SignInButton mode="modal">
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full text-left text-base font-medium text-[#334155] hover:text-[#0F172A] py-2 px-3 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                  >
+                    Sign in
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full text-center text-sm font-semibold bg-[#0F172A] text-white hover:bg-[#1E293B] py-2.5 px-4 rounded-lg transition-all shadow-xs cursor-pointer"
+                  >
+                    Sign up
+                  </button>
+                </SignUpButton>
+              </Show>
+            </div>
           </nav>
         )}
       </header>
