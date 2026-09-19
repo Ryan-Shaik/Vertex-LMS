@@ -156,23 +156,52 @@ export interface CourseCardData {
   totalDuration: number
 }
 
+/**
+ * Raw lesson stub as returned by courseBySlugQuery / lessonBySlugQuery
+ * module projections. No derived numbering.
+ */
+export interface RawLessonStub {
+  _id: string
+  title: string
+  slug: string
+  duration: number
+  isFreePreview?: boolean
+}
+
+/**
+ * Raw module shape returned directly by GROQ — no derived numbering.
+ */
+export interface RawModule {
+  _key: string
+  title: string
+  summary?: string
+  lessons: RawLessonStub[]
+}
+
+/**
+ * Module with numbering derived from array position at the consuming boundary
+ * via `deriveCourseNumbering()` in sanity/lib/transforms.ts.
+ */
 export interface ResolvedModule {
   _key: string
   title: string
   summary?: string
+  /** 1-based module position */
   moduleNumber: number
-  lessons: Array<{
-    _id: string
-    title: string
-    slug: string
-    duration: number
-    isFreePreview?: boolean
+  lessons: Array<RawLessonStub & {
+    /** 0-based lesson position within this module */
     lessonIndex: number
-    displayNumber: string // e.g. "5.1"
+    /** Human-readable label, e.g. "2.3" */
+    displayNumber: string
   }>
 }
 
-export interface CourseDetailData {
+/**
+ * Raw query result shape from courseBySlugQuery.
+ * Modules are in raw (un-numbered) form. Call `deriveCourseNumbering()`
+ * to produce a fully resolved CourseDetailData.
+ */
+export interface CourseQueryResult {
   _id: string
   title: string
   slug: string
@@ -185,12 +214,25 @@ export interface CourseDetailData {
   instructor: Instructor
   category: Category
   learningOutcomes?: LearningOutcome[]
-  modules: ResolvedModule[]
+  modules: RawModule[]
   totalLessons: number
   totalDuration: number
 }
 
-export interface LessonDetailData {
+/**
+ * Fully resolved course with derived module and lesson numbering.
+ * Obtain by passing a CourseQueryResult through `deriveCourseNumbering()`.
+ */
+export interface CourseDetailData extends Omit<CourseQueryResult, 'modules'> {
+  modules: ResolvedModule[]
+}
+
+/**
+ * Raw query result shape from lessonBySlugQuery.
+ * The nested course carries RawModule[] with no derived numbering.
+ * Call `deriveLessonDetail()` (or resolve manually) at the consuming boundary.
+ */
+export interface LessonQueryResult {
   _id: string
   title: string
   slug: string
@@ -203,6 +245,7 @@ export interface LessonDetailData {
   proTip?: string
   notes?: PortableTextBlock[]
   resources?: Resource[]
+  /** Reverse-referenced parent course with raw (un-numbered) modules. */
   course: {
     _id: string
     title: string
@@ -212,12 +255,26 @@ export interface LessonDetailData {
       expertise: string
       photo?: SanityImageReference
     }
+    modules: RawModule[]
   }
+}
+
+/**
+ * Fully resolved lesson detail with derived numbering and navigation.
+ * Obtain by passing a LessonQueryResult through `deriveLessonDetail()`
+ * in sanity/lib/transforms.ts.
+ */
+export interface LessonDetailData extends Omit<LessonQueryResult, 'course'> {
+  course: Omit<LessonQueryResult['course'], 'modules'>
+  /** Position of this lesson within its parent module. */
   currentModule: {
     title: string
+    /** 1-based module position */
     moduleIndex: number
-    lessonNumber: string // e.g. "5.1"
+    /** Human-readable label, e.g. "5.1" */
+    lessonNumber: string
   }
+  /** All modules with derived numbering for the sidebar curriculum. */
   allModules: ResolvedModule[]
   navigation: {
     prevLesson: { title: string; slug: string } | null
