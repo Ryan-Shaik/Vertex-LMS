@@ -32,6 +32,11 @@ export const allCoursesQuery = groq`
 /**
  * Single course detail query by slug: resolves instructor, category,
  * learning outcomes, and all modules with their referenced lessons.
+ *
+ * @returns {CourseQueryResult} Raw shape — modules carry no derived numbering.
+ * Use `fetchCourseBySlug()` from sanity/lib/fetchers.ts to obtain the
+ * fully-resolved `CourseDetailData` with `moduleNumber`, `lessonIndex`,
+ * and `displayNumber` already derived.
  */
 export const courseBySlugQuery = groq`
   *[_type == "course" && slug.current == $slug][0] {
@@ -84,6 +89,12 @@ export const courseBySlugQuery = groq`
 /**
  * Single lesson query by slug: includes reverse-reference to the parent course
  * and full curriculum to build lesson sidebar navigation.
+ *
+ * @returns {LessonQueryResult} Raw shape — the nested course modules carry no
+ * derived numbering, and `currentModule`, `allModules`, and `navigation` are
+ * NOT present in the query result.
+ * Use `fetchLessonBySlug()` from sanity/lib/fetchers.ts to obtain the fully-
+ * resolved `LessonDetailData` with all derived fields applied.
  */
 export const lessonBySlugQuery = groq`
   *[_type == "lesson" && slug.current == $slug][0] {

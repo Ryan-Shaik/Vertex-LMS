@@ -197,6 +197,51 @@ export interface ResolvedModule {
 }
 
 /**
+ * Projected instructor shape returned by courseBySlugQuery,
+ * allInstructorsQuery, and instructorBySlugQuery.
+ * Slugs are flattened to scalar strings and document discriminators are omitted.
+ */
+export interface ProjectedInstructor {
+  _id: string
+  name: string
+  slug: string
+  expertise: string
+  bio: string
+  photo?: SanityImageReference
+}
+
+export type CourseInstructor = ProjectedInstructor
+
+/**
+ * Projected category shape returned by courseBySlugQuery
+ * and allCategoriesQuery.
+ * Slugs are flattened to scalar strings and document discriminators are omitted.
+ */
+export interface ProjectedCategory {
+  _id: string
+  title: string
+  slug: string
+  description?: string
+}
+
+export type CourseCategory = ProjectedCategory
+
+export interface InstructorDetailData extends ProjectedInstructor {
+  courses: Array<{
+    _id: string
+    title: string
+    slug: string
+    summary: string
+    coverImage: SanityImageReference
+    level: 'beginner' | 'intermediate' | 'advanced'
+    price: number
+    popular?: boolean
+    studentCount?: number
+    totalLessons: number
+  }>
+}
+
+/**
  * Raw query result shape from courseBySlugQuery.
  * Modules are in raw (un-numbered) form. Call `deriveCourseNumbering()`
  * to produce a fully resolved CourseDetailData.
@@ -211,8 +256,8 @@ export interface CourseQueryResult {
   price: number
   popular?: boolean
   studentCount?: number
-  instructor: Instructor
-  category: Category
+  instructor: ProjectedInstructor
+  category: ProjectedCategory
   learningOutcomes?: LearningOutcome[]
   modules: RawModule[]
   totalLessons: number
