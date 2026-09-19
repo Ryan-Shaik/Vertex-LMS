@@ -1,0 +1,35 @@
+{
+  "name": "vertex-studio",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "author": "Vertex",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "deploy-graphql": "sanity graphql deploy",
+    "typegen": "sanity typegen generate"
+  },
+  "keywords": [
+    "sanity"
+  ],
+  "dependencies": {
+    "@sanity/icons": "^3.7.4",
+    "@sanity/vision": "^5.31.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sanity": "^5.31.2",
+    "styled-components": "^6.5.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.0.0"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  }
+}
