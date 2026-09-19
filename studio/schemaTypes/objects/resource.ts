@@ -1,5 +1,5 @@
 import { defineType, defineField } from 'sanity'
-import { LinkIcon } from '@sanity/icons/Link'
+import { LinkIcon } from '@sanity/icons'
 
 export const resource = defineType({
   name: 'resource',

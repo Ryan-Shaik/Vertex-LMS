@@ -1,5 +1,5 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
-import { BookIcon } from '@sanity/icons/Book'
+import { BookIcon } from '@sanity/icons'
 
 export const course = defineType({
   name: 'course',

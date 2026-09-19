@@ -1,9 +1,5 @@
 import type { StructureResolver } from 'sanity/structure'
-import { BookIcon } from '@sanity/icons/Book'
-import { PlayIcon } from '@sanity/icons/Play'
-import { UserIcon } from '@sanity/icons/User'
-import { TagIcon } from '@sanity/icons/Tag'
-import { DocumentVideoIcon } from '@sanity/icons/DocumentVideo'
+import { BookIcon, PlayIcon, UserIcon, TagIcon, DocumentVideoIcon } from '@sanity/icons'
 
 export const structure: StructureResolver = (S) =>
   S.list()

@@ -1,5 +1,5 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
-import { DocumentVideoIcon } from '@sanity/icons/DocumentVideo'
+import { DocumentVideoIcon } from '@sanity/icons'
 
 export const video = defineType({
   name: 'video',

@@ -1,5 +1,5 @@
 import { defineType, defineField } from 'sanity'
-import { CheckmarkCircleIcon } from '@sanity/icons/CheckmarkCircle'
+import { CheckmarkCircleIcon } from '@sanity/icons'
 
 export const learningOutcome = defineType({
   name: 'learningOutcome',

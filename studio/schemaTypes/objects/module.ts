@@ -1,5 +1,5 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
-import { FolderIcon } from '@sanity/icons/Folder'
+import { FolderIcon } from '@sanity/icons'
 
 export const moduleObject = defineType({
   name: 'module',
