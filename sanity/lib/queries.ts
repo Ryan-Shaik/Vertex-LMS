@@ -24,8 +24,8 @@ export const allCoursesQuery = groq`
       title,
       "slug": slug.current
     },
-    "totalLessons": count(modules[].lessons[]),
-    "totalDuration": math::sum(modules[].lessons[]->duration)
+    "totalLessons": count(array::unique(modules[].lessons[]._ref)),
+    "totalDuration": math::sum(*[_type == "lesson" && _id in ^.modules[].lessons[]._ref].duration)
   }
 `
 
@@ -81,8 +81,8 @@ export const courseBySlugQuery = groq`
         isFreePreview
       }
     },
-    "totalLessons": count(modules[].lessons[]),
-    "totalDuration": math::sum(modules[].lessons[]->duration)
+    "totalLessons": count(array::unique(modules[].lessons[]._ref)),
+    "totalDuration": math::sum(*[_type == "lesson" && _id in ^.modules[].lessons[]._ref].duration)
   }
 `
 
@@ -185,7 +185,7 @@ export const instructorBySlugQuery = groq`
       price,
       popular,
       studentCount,
-      "totalLessons": count(modules[].lessons[])
+      "totalLessons": count(array::unique(modules[].lessons[]._ref))
     }
   }
 `
