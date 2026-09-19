@@ -157,41 +157,46 @@ export interface CourseCardData {
 }
 
 /**
- * Raw lesson stub as returned by courseBySlugQuery / lessonBySlugQuery
- * module projections. No derived numbering.
+ * Lesson reference stub within a course module projection.
+ * Numbering metadata fields (`lessonIndex`, `displayNumber`) are optional
+ * on the raw query result and populated when transformed by `deriveCourseNumbering()`.
  */
-export interface RawLessonStub {
+export interface CourseModuleLesson {
   _id: string
   title: string
   slug: string
   duration: number
   isFreePreview?: boolean
+  /** 0-based lesson position within this module (populated by deriveCourseNumbering) */
+  lessonIndex?: number
+  /** Formatted label e.g. "5.1" (populated by deriveCourseNumbering) */
+  displayNumber?: string
 }
 
+export type RawLessonStub = CourseModuleLesson
+
 /**
- * Raw module shape returned directly by GROQ — no derived numbering.
+ * Module object within a course projection.
+ * `moduleNumber` is optional on the raw query result and populated by `deriveCourseNumbering()`.
  */
-export interface RawModule {
+export interface CourseModule {
   _key: string
   title: string
   summary?: string
-  lessons: RawLessonStub[]
+  /** 1-based module position (populated by deriveCourseNumbering) */
+  moduleNumber?: number
+  lessons: CourseModuleLesson[]
 }
 
+export type RawModule = CourseModule
+
 /**
- * Module with numbering derived from array position at the consuming boundary
- * via `deriveCourseNumbering()` in sanity/lib/transforms.ts.
+ * Resolved module with required numbering metadata.
  */
-export interface ResolvedModule {
-  _key: string
-  title: string
-  summary?: string
-  /** 1-based module position */
+export interface ResolvedModule extends CourseModule {
   moduleNumber: number
-  lessons: Array<RawLessonStub & {
-    /** 0-based lesson position within this module */
+  lessons: Array<CourseModuleLesson & {
     lessonIndex: number
-    /** Human-readable label, e.g. "2.3" */
     displayNumber: string
   }>
 }
@@ -242,11 +247,11 @@ export interface InstructorDetailData extends ProjectedInstructor {
 }
 
 /**
- * Raw query result shape from courseBySlugQuery.
- * Modules are in raw (un-numbered) form. Call `deriveCourseNumbering()`
- * to produce a fully resolved CourseDetailData.
+ * Course detail data precisely matching the fields returned by `courseBySlugQuery`.
+ * Uses query-specific projected interfaces (CourseInstructor, CourseCategory, CourseModule)
+ * structurally aligned with the GROQ projection.
  */
-export interface CourseQueryResult {
+export interface CourseDetailData {
   _id: string
   title: string
   slug: string
@@ -256,19 +261,24 @@ export interface CourseQueryResult {
   price: number
   popular?: boolean
   studentCount?: number
-  instructor: ProjectedInstructor
-  category: ProjectedCategory
+  instructor: CourseInstructor
+  category: CourseCategory
   learningOutcomes?: LearningOutcome[]
-  modules: RawModule[]
+  modules: CourseModule[]
   totalLessons: number
   totalDuration: number
 }
 
 /**
- * Fully resolved course with derived module and lesson numbering.
- * Obtain by passing a CourseQueryResult through `deriveCourseNumbering()`.
+ * Type alias representing the query result shape of courseBySlugQuery.
  */
-export interface CourseDetailData extends Omit<CourseQueryResult, 'modules'> {
+export type CourseQueryResult = CourseDetailData
+
+/**
+ * Fully resolved course detail data with guaranteed module and lesson numbering.
+ * Produced by passing CourseDetailData through `deriveCourseNumbering()`.
+ */
+export interface ResolvedCourseDetailData extends CourseDetailData {
   modules: ResolvedModule[]
 }
 

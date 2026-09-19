@@ -1,6 +1,7 @@
 import type {
   CourseQueryResult,
   CourseDetailData,
+  ResolvedCourseDetailData,
   LessonQueryResult,
   LessonDetailData,
   RawModule,
@@ -18,7 +19,7 @@ import type {
  * const raw = await sanityFetch({ query: courseBySlugQuery, params: { slug } })
  * const course = raw ? deriveCourseNumbering(raw) : null
  */
-export function deriveCourseNumbering(raw: CourseQueryResult): CourseDetailData {
+export function deriveCourseNumbering(raw: CourseQueryResult): ResolvedCourseDetailData {
   const modules: ResolvedModule[] = raw.modules.map(
     (mod: RawModule, moduleIndex: number) => ({
       ...mod,
