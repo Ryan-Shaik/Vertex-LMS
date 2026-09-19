@@ -30,7 +30,37 @@ export const moduleObject = defineType({
           to: [{ type: 'lesson' }],
         }),
       ],
-      validation: (rule) => rule.required().min(1),
+      validation: (rule) =>
+        rule
+          .required()
+          .min(1)
+          .unique()
+          .custom((lessons, context) => {
+            const parentDoc = context.document as
+              | { modules?: Array<{ _key?: string; lessons?: Array<{ _ref?: string }> }> }
+              | undefined
+
+            if (!parentDoc?.modules || !Array.isArray(lessons)) return true
+
+            // Count occurrences of each lesson ref across all modules in this course
+            const refCounts = new Map<string, number>()
+            for (const mod of parentDoc.modules) {
+              if (Array.isArray(mod.lessons)) {
+                for (const item of mod.lessons) {
+                  if (item?._ref) {
+                    refCounts.set(item._ref, (refCounts.get(item._ref) || 0) + 1)
+                  }
+                }
+              }
+            }
+
+            for (const item of lessons as Array<{ _ref?: string }>) {
+              if (item?._ref && (refCounts.get(item._ref) || 0) > 1) {
+                return 'A lesson cannot be referenced more than once within the same course.'
+              }
+            }
+            return true
+          }),
     }),
   ],
   preview: {

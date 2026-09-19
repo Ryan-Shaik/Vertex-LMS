@@ -69,19 +69,33 @@ export async function fetchCourseBySlug(slug: string): Promise<CourseDetailData 
  * - `allModules` with numbering for the sidebar curriculum
  * - `navigation` with prev/next lesson stubs
  *
+ * If `courseSlug` (or `courseId`) is provided, scopes the reverse-reference
+ * to that specific course rather than arbitrarily picking the first course
+ * that references this lesson.
+ *
  * Returns `null` when:
  * - No lesson matches the slug
  * - The lesson is not found inside its reverse-referenced course curriculum
  *   (guards against stale or mis-linked content)
  *
  * @example
- * const lesson = await fetchLessonBySlug(params.slug)
+ * const lesson = await fetchLessonBySlug(params.slug, params.courseSlug)
  * if (!lesson) notFound()
  */
-export async function fetchLessonBySlug(slug: string): Promise<LessonDetailData | null> {
+export async function fetchLessonBySlug(
+  slug: string,
+  options?: { courseSlug?: string; courseId?: string } | string
+): Promise<LessonDetailData | null> {
+  const courseSlug = typeof options === 'string' ? options : options?.courseSlug
+  const courseId = typeof options === 'object' ? options?.courseId : undefined
+
   const result = await sanityFetch({
     query: lessonBySlugQuery,
-    params: { slug },
+    params: {
+      slug,
+      courseSlug: courseSlug ?? null,
+      courseId: courseId ?? null,
+    },
   })
   if (!result) return null
   return deriveLessonDetail(result as LessonQueryResult)

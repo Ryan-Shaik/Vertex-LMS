@@ -290,7 +290,7 @@ export interface LessonQueryResult {
   proTip?: string
   notes?: PortableTextBlock[]
   resources?: Resource[]
-  /** Reverse-referenced parent course with raw (un-numbered) modules. */
+  /** Reverse-referenced parent course with raw (un-numbered) modules, or null if no parent matches. */
   course: {
     _id: string
     title: string
@@ -301,7 +301,7 @@ export interface LessonQueryResult {
       photo?: SanityImageReference
     }
     modules: RawModule[]
-  }
+  } | null
 }
 
 /**

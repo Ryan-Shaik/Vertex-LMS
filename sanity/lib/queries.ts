@@ -90,6 +90,10 @@ export const courseBySlugQuery = groq`
  * Single lesson query by slug: includes reverse-reference to the parent course
  * and full curriculum to build lesson sidebar navigation.
  *
+ * Accepts `$slug` (required), plus optional `$courseSlug` or `$courseId`
+ * to scope the reverse-reference to a specific parent course when a lesson is
+ * shared across multiple courses.
+ *
  * @returns {LessonQueryResult} Raw shape — the nested course modules carry no
  * derived numbering, and `currentModule`, `allModules`, and `navigation` are
  * NOT present in the query result.
@@ -116,7 +120,12 @@ export const lessonBySlugQuery = groq`
       description,
       url
     },
-    "course": *[_type == "course" && references(^._id)][0] {
+    "course": *[
+      _type == "course" &&
+      references(^._id) &&
+      (!defined($courseSlug) || slug.current == $courseSlug) &&
+      (!defined($courseId) || _id in [$courseId, "drafts." + $courseId])
+    ][0] {
       _id,
       title,
       "slug": slug.current,

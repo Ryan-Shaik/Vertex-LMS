@@ -49,9 +49,11 @@ export function deriveCourseNumbering(raw: CourseQueryResult): CourseDetailData 
  * const lesson = raw ? deriveLessonDetail(raw) : null
  */
 export function deriveLessonDetail(raw: LessonQueryResult): LessonDetailData | null {
-  // Derive numbering directly from the raw modules — no need to fake a full
-  // CourseQueryResult, since only the modules array drives derivation.
-  const resolvedModules: ResolvedModule[] = raw.course.modules.map(
+  if (!raw.course?.modules || !Array.isArray(raw.course.modules)) {
+    return null
+  }
+  const course = raw.course
+  const resolvedModules: ResolvedModule[] = course.modules.map(
     (mod: RawModule, moduleIndex: number) => ({
       ...mod,
       moduleNumber: moduleIndex + 1,
@@ -93,7 +95,6 @@ export function deriveLessonDetail(raw: LessonQueryResult): LessonDetailData | n
       ? { title: flatLessons[currentIdx + 1].title, slug: flatLessons[currentIdx + 1].slug }
       : null
 
-  const { course } = raw
   // Strip raw modules from the nested course — consumers use allModules instead
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { modules: _rawModules, ...courseWithoutModules } = course
